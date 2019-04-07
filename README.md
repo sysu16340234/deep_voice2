@@ -61,3 +61,22 @@ deep voice 1中的每层输出如下:
 
 ![](https://github.com/sysu16340234/deep_voice2/blob/master/img/3.png)
 
+6.标准化基频f通过如下方法转换为真实基频F0:
+
+![](https://github.com/sysu16340234/deep_voice2/blob/master/img/4.png)
+
+其中μF和σF分别是说话者样本基频的均值和标准差;
+
+**4.音频合成模型**
+
+音频合成模型采用和deep voice1相似的具有两层双向QRNN调整网络的WaveNet结构,但是删除了门控tanh和残差连接之间的1x1卷积,并且对WaveNet中的每一层采用相同的偏置值;
+
+## 多speaker deep voice 2
+
+**整体结构**
+
+为了使模型能够生成多speaker的音频,为每个说话者增加一个低维嵌入向量,用这个嵌入来产生RNN的初始状态,非线性偏置和门控乘法算子;这些嵌入向量用一个[-0.1,0.1]的均匀分布来初始化,通过反向传播进行联合训练;
+
+**模型细节**
+
+![](https://github.com/sysu16340234/deep_voice2/blob/master/img/deep_voice_2.png)
