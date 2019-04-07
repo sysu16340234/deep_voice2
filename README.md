@@ -67,7 +67,7 @@ deep voice 1中的每层输出如下:
 
 其中μF和σF分别是说话者样本基频的均值和标准差;
 
-**4.音频合成模型**
+**4.声码器**
 
 音频合成模型采用和deep voice1相似的具有两层双向QRNN调整网络的WaveNet结构,但是删除了门控tanh和残差连接之间的1x1卷积,并且对WaveNet中的每一层采用相同的偏置值;
 
@@ -107,8 +107,30 @@ deep voice 1中的每层输出如下:
 
 频率模型采用使用嵌入向量初始化RNN隐状态来进行循环初始化,在计算标准化基频时采用与单speaker相同的方法,但是在计算真实基频时采用如下方法:
 
-![](https://github.com/sysu16340234/deep_voice2/blob/master/img/6.png)
+![](https://github.com/sysu16340234/deep_voice2/blob/master/6.png)
 
 其中gf是嵌入向量,μF0和σF0是初始化给F0的可训练常量参数,Vμ和Vσ是可训练参数向量;
+
+**4.声码器**
+
+音频合成模块使用输入增强,在调整网络的每个输入帧的输入与嵌入向量连接作为增强输入;
+
+## 多speaker Tacotron
+
+**模型结构**
+
+文中提到了可以用一种Tacotron的变种来处理多个speaker嵌入的问题:
+
+![](https://github.com/sysu16340234/deep_voice2/blob/master/img/tacotron.png)
+
+文章中提到的改进主要有两个方面:
+
+* **字符到频谱模块**:将speaker嵌入向量结合到字符编码器中,具体做法是:在每一个时间步骤,在highway层使用一个特定的嵌入向量作为额外输入,并使用另外一个嵌入向量来初始化RNN;
+
+而在解码器中则使用如下方法:使用一个嵌入向量作为pre-net的额外输入,一个嵌入向量作为attentionRNN的attention 上下文向量,一个嵌入向量来初始化解码器GRU的隐状态以及一个作为attention机制中tanh的偏差;
+
+* **频谱到波形模块**:不使用Tacotron原来的GriffinLim算法,而是训练一个WaveNet作为声码器,这个声码器与deep voice 2介绍的大致相同,不过输入是经过线性变换的对数幅度频谱而不是声素和基频;
+
+
 
 
